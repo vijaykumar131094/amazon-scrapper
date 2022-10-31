@@ -1,4 +1,6 @@
 from requests_html import HTMLSession
+import json
+import time
 
 class Reviews:
     def __init__(self, asin) -> None:
@@ -30,7 +32,21 @@ class Reviews:
             total.append(data)
         return total
 
+    def save(self, results):
+        with open(self.asin + '-reviews.json','w') as f:
+            json.dump(results,f)
+
 if __name__ == '__main__':
     amz = Reviews('B098R2XKM3')
-    reviews = amz.pagination(1)
-    print(amz.parse(reviews))
+    results = []
+    for x in range(1,10):
+        print('getting page',x)
+        time.sleep(0.6)
+        reviews = amz.pagination(x)
+        if reviews is not False:
+            results.append(amz.parse(reviews))
+        else:
+            print('no more pages')
+            break
+
+    amz.save(results) 
